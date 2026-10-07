@@ -27,10 +27,12 @@ def root():
 def create_transaction(transaction: TransactionRequest):
     transaction_id = str(uuid4())
     transaction_time = datetime.now()
+    transaction_hour = transaction_time.hour
 
     return {
         "message": "Transacção recebida com sucesso",
         "transaction_id": transaction_id,
         "transaction": transaction,
-        "timestamp": transaction_time
+        "timestamp": transaction_time,
+        "hour": transaction_hour
     }

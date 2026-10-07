@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import joblib
+import pandas as pd
 
 
 MODEL_PATH = Path("ml/models/random_forest_model.joblib")
@@ -24,6 +25,32 @@ def load_fraud_model():
         )
 
     return joblib.load(MODEL_PATH)
+
+def calculate_ml_score(features: dict) -> float:
+    metadata = load_model_metadata()
+    model = load_fraud_model()
+
+    feature_names = metadata["features"]
+
+    missing_features = [
+        feature
+        for feature in feature_names
+        if feature not in features
+    ]
+
+    if missing_features:
+        raise ValueError(
+            f"Features em falta: {', '.join(missing_features)}"
+        )
+
+    input_data = pd.DataFrame(
+        [[features[feature] for feature in feature_names]],
+        columns=feature_names
+    )
+
+    ml_score = model.predict_proba(input_data)[0][1]
+
+    return float(ml_score)
 
 def classify_risk(risk_score: float) -> str:
     if risk_score < 0 or risk_score > 100:

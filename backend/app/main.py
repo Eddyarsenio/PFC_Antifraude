@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from datetime import datetime
 from uuid import uuid4
+from backend.app.services.feature_engineering import extract_transaction_hour
 
 app = FastAPI(
     title="Sistema Antifraude - PFC",
@@ -27,7 +28,7 @@ def root():
 def create_transaction(transaction: TransactionRequest):
     transaction_id = str(uuid4())
     transaction_time = datetime.now()
-    transaction_hour = transaction_time.hour
+    transaction_hour = extract_transaction_hour(transaction_time)
 
     return {
         "message": "Transacção recebida com sucesso",

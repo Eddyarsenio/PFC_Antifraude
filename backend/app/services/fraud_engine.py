@@ -52,6 +52,30 @@ def calculate_ml_score(features: dict) -> float:
 
     return float(ml_score)
 
+def calculate_risk_score(
+    ml_score: float,
+    rule_score: float,
+    ml_weight: float = 0.70,
+    rule_weight: float = 0.30
+) -> float:
+    if not 0 <= ml_score <= 1:
+        raise ValueError("O ML Score deve estar entre 0 e 1.")
+
+    if not 0 <= rule_score <= 100:
+        raise ValueError("O Rule Score deve estar entre 0 e 100.")
+
+    if abs((ml_weight + rule_weight) - 1.0) > 1e-9:
+        raise ValueError("A soma dos pesos deve ser igual a 1.")
+
+    ml_score_100 = ml_score * 100
+
+    risk_score = (
+        ml_score_100 * ml_weight
+        + rule_score * rule_weight
+    )
+
+    return round(risk_score, 2)
+
 def classify_risk(risk_score: float) -> str:
     if risk_score < 0 or risk_score > 100:
         raise ValueError("O Risk Score deve estar entre 0 e 100.")

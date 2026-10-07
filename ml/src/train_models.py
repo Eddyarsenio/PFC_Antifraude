@@ -46,6 +46,23 @@ y = df[TARGET]
 
 fraud_difficulty = df["fraud_difficulty"]
 
+print("Dimensão do dataset completo:")
+print(df.shape)
+
+print("\nDimensão das features X:")
+print(X.shape)
+
+print("\nDimensão da variável alvo y:")
+print(y.shape)
+
+print("\nDistribuição da variável alvo:")
+print(y.value_counts())
+
+print("\nDistribuição percentual:")
+print(
+    (y.value_counts(normalize=True) * 100).round(2)
+)
+
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
@@ -55,6 +72,17 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 difficulty_test = fraud_difficulty.loc[X_test.index]
+
+print("\n--- Divisão treino/teste ---")
+
+print("X_train:", X_train.shape)
+print("X_test:", X_test.shape)
+
+print("\nClasses no treino:")
+print(y_train.value_counts())
+
+print("\nClasses no teste:")
+print(y_test.value_counts())
 
 logistic_model = Pipeline([
     (
@@ -444,34 +472,10 @@ print(
     f"ROC-AUC: {roc_auc_rf:.4f}"
 )
 
-print("\n--- Divisão treino/teste ---")
-
-print("X_train:", X_train.shape)
-print("X_test:", X_test.shape)
-
-print("\nClasses no treino:")
-print(y_train.value_counts())
-
-print("\nClasses no teste:")
-print(y_test.value_counts())
 
 
-print("Dimensão do dataset completo:")
-print(df.shape)
 
-print("\nDimensão das features X:")
-print(X.shape)
 
-print("\nDimensão da variável alvo y:")
-print(y.shape)
-
-print("\nDistribuição da variável alvo:")
-print(y.value_counts())
-
-print("\nDistribuição percentual:")
-print(
-    (y.value_counts(normalize=True) * 100).round(2)
-)
 
 feature_importance = pd.DataFrame({
     "feature": FEATURES,

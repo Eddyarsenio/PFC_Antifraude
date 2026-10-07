@@ -1,3 +1,30 @@
+import json
+from pathlib import Path
+
+import joblib
+
+
+MODEL_PATH = Path("ml/models/random_forest_model.joblib")
+METADATA_PATH = Path("ml/models/model_metadata.json")
+
+
+def load_model_metadata() -> dict:
+    if not METADATA_PATH.exists():
+        raise FileNotFoundError(
+            f"Metadata do modelo não encontrado: {METADATA_PATH}"
+        )
+
+    with open(METADATA_PATH, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+def load_fraud_model():
+    if not MODEL_PATH.exists():
+        raise FileNotFoundError(
+            f"Modelo de Machine Learning não encontrado: {MODEL_PATH}"
+        )
+
+    return joblib.load(MODEL_PATH)
+
 def classify_risk(risk_score: float) -> str:
     if risk_score < 0 or risk_score > 100:
         raise ValueError("O Risk Score deve estar entre 0 e 100.")

@@ -119,3 +119,27 @@ def calculate_rule_score(
         score += 30
 
     return score
+
+def analyze_transaction(features: dict) -> dict:
+    ml_score = calculate_ml_score(features)
+
+    rule_score = calculate_rule_score(
+        beneficiary_new=features["beneficiary_new"],
+        device_new=features["device_new"],
+        ip_anomaly=features["ip_anomaly"],
+        location_anomaly=features["location_anomaly"]
+    )
+
+    risk_score = calculate_risk_score(
+        ml_score=ml_score,
+        rule_score=rule_score
+    )
+
+    risk_level = classify_risk(risk_score)
+
+    return {
+        "ml_score": round(ml_score, 4),
+        "rule_score": rule_score,
+        "risk_score": risk_score,
+        "risk_level": risk_level
+    }

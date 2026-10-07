@@ -31,7 +31,11 @@ def root():
         "status": "online"
     }
 
-@app.post("/transactions", response_model=TransactionResponse)
+@app.post(
+    "/transactions",
+    response_model=TransactionResponse,
+    status_code=201
+)
 def create_transaction(transaction: TransactionRequest):
     transaction_id = str(uuid4())
     transaction_time = datetime.now()

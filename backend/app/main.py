@@ -16,6 +16,13 @@ class TransactionRequest(BaseModel):
     amount: float = Field(gt=0)
     device_id: str
 
+class TransactionResponse(BaseModel):
+    message: str
+    transaction_id: str
+    transaction: TransactionRequest
+    timestamp: datetime
+    hour: int
+
 
 @app.get("/")
 def root():
@@ -24,7 +31,7 @@ def root():
         "status": "online"
     }
 
-@app.post("/transactions")
+@app.post("/transactions", response_model=TransactionResponse)
 def create_transaction(transaction: TransactionRequest):
     transaction_id = str(uuid4())
     transaction_time = datetime.now()

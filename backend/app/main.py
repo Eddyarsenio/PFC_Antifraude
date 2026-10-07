@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel, Field
 
 app = FastAPI(
     title="Sistema Antifraude - PFC",
@@ -6,10 +7,23 @@ app = FastAPI(
     version="1.0.0"
 )
 
+class TransactionRequest(BaseModel):
+    customer_id: str
+    beneficiary_id: str
+    amount: float = Field(gt=0)
+    device_id: str
+
 
 @app.get("/")
 def root():
     return {
         "message": "Sistema Antifraude API",
         "status": "online"
+    }
+
+@app.post("/transactions")
+def create_transaction(transaction: TransactionRequest):
+    return {
+        "message": "Transacção recebida com sucesso",
+        "transaction": transaction
     }

@@ -1,0 +1,23 @@
+{
+  "model_name": "Random Forest Fraud Detection",
+  "model_type": "RandomForestClassifier",
+  "version": "1.0",
+  "model_file": "random_forest_model.joblib",
+  "threshold": 0.50,
+  "features": [
+    "amount",
+    "beneficiary_new",
+    "device_new",
+    "ip_anomaly",
+    "location_anomaly",
+    "transactions_last_10m",
+    "customer_avg_amount",
+    "amount_ratio",
+    "customer_tx_count_24h",
+    "beneficiary_tx_count",
+    "hour"
+  ],
+  "target": "fraud_label",
+  "training_data": "synthetic",
+  "random_state": 42
+}

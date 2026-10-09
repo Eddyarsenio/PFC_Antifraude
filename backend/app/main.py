@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from datetime import datetime
 from uuid import uuid4
+from backend.app.database import get_db_connection
 from backend.app.services.feature_engineering import extract_transaction_hour
 from backend.app.services.fraud_engine import analyze_transaction
 
@@ -64,12 +65,72 @@ def fraud_analysis(request: FraudAnalysisRequest):
 @app.post(
     "/transactions",
     response_model=TransactionResponse,
-    status_code=201
+    status_code=201,
+    responses={
+        404: {"description": "Cliente ou beneficiário não encontrado"}
+    }
 )
 def create_transaction(transaction: TransactionRequest):
     transaction_id = str(uuid4())
     transaction_time = datetime.now()
     transaction_hour = extract_transaction_hour(transaction_time)
+
+    with get_db_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM customers WHERE customer_id = %s",
+                (transaction.customer_id,)
+            )
+
+            customer_exists = cursor.fetchone()
+
+            if customer_exists is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Cliente não encontrado"
+                )
+
+                cursor.execute(
+                """
+                SELECT 1
+                FROM beneficiaries
+                WHERE beneficiary_id = %s
+                  AND customer_id = %s
+                """,
+                (
+                    transaction.beneficiary_id,
+                    transaction.customer_id
+                )
+            )
+
+            beneficiary_exists = cursor.fetchone()
+
+            if beneficiary_exists is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Beneficiário não encontrado para este cliente"
+                )
+            cursor.execute(
+                """
+                INSERT INTO transactions (
+                    transaction_id,
+                    customer_id,
+                    beneficiary_id,
+                    amount,
+                    device_id,
+                    transaction_time
+                )
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    transaction_id,
+                    transaction.customer_id,
+                    transaction.beneficiary_id,
+                    transaction.amount,
+                    transaction.device_id,
+                    transaction_time
+                )
+            )
 
     return {
         "message": "Transacção recebida com sucesso",
